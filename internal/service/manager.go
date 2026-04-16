@@ -144,12 +144,17 @@ func (m *Manager) Start(id string) error {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
-	// 检查是否已在运行
-	if m.isRunning(svc.Name) {
-		return fmt.Errorf("service already running: %s", svc.Name)
+	// 检查是否已在内存中运行
+	if cmd, ok := m.process[svc.Name]; ok && cmd.Process != nil {
+		err := cmd.Process.Signal(syscall.Signal(0))
+		if err == nil {
+			return fmt.Errorf("service already running: %s", svc.Name)
+		}
 	}
 
-	cmd := exec.Command("bash", "-c", svc.StartScript)
+	// 使用 & 确保进程在后台运行
+	startCmd := fmt.Sprintf("%s &", svc.StartScript)
+	cmd := exec.Command("bash", "-c", startCmd)
 	if svc.WorkDir != "" {
 		cmd.Dir = svc.WorkDir
 	}
@@ -187,10 +192,6 @@ func (m *Manager) Stop(id string) error {
 
 	m.mu.Lock()
 	defer m.mu.Unlock()
-
-	if !m.isRunning(svc.Name) {
-		return fmt.Errorf("service not running: %s", svc.Name)
-	}
 
 	// 执行停止脚本
 	cmd := exec.Command("bash", "-c", svc.StopScript)
@@ -233,13 +234,43 @@ func (m *Manager) isRunning(name string) bool {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
 
+	// 先检查内存中的进程
 	if cmd, ok := m.process[name]; ok {
 		if cmd.Process != nil {
 			err := cmd.Process.Signal(syscall.Signal(0))
-			return err == nil
+			if err == nil {
+				return true
+			}
 		}
 	}
-	return false
+
+	// 内存中没有，检查系统进程（通过端口）
+	return m.checkPortRunning(name)
+}
+
+func (m *Manager) checkPortRunning(name string) bool {
+	// 获取服务的端口
+	list, err := m.store.Load()
+	if err != nil {
+		return false
+	}
+
+	var port int
+	for _, s := range list.Services {
+		if s.Name == name {
+			port = s.Port
+			break
+		}
+	}
+
+	if port == 0 {
+		return false
+	}
+
+	// 检查端口是否被占用
+	cmd := exec.Command("lsof", "-i", fmt.Sprintf(":%d", port))
+	output, _ := cmd.Output()
+	return len(output) > 0
 }
 
 func (m *Manager) updateStatus(svc *model.Service) {

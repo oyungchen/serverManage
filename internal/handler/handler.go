@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"path/filepath"
 	"strconv"
-	"strings"
 
 	"serverManage/internal/launcher"
 	"serverManage/internal/logger"
@@ -54,7 +53,7 @@ func (h *Handler) RegisterRoutes(r *gin.Engine) {
 	r.GET("/ws/logs/:serviceId", h.HandleWebSocket)
 
 	// 静态文件
-	r.Static("/static", h.staticDir)
+	r.Static("/assets", filepath.Join(h.staticDir, "assets"))
 	r.GET("/", func(c *gin.Context) {
 		c.File(filepath.Join(h.staticDir, "index.html"))
 	})

@@ -56,7 +56,9 @@ const loading = ref(false)
 
 const loadServices = async () => {
   try {
+    console.log('Loading services...')
     const res = await getServices()
+    console.log('Services loaded:', res.data)
     services.value = res.data
   } catch (e) {
     console.error('Failed to load services:', e)
@@ -64,13 +66,29 @@ const loadServices = async () => {
 }
 
 const handleStart = async (id) => {
-  await startService(id)
-  await loadServices()
+  console.log('handleStart called with id:', id)
+  try {
+    console.log('Calling startService...')
+    const res = await startService(id)
+    console.log('startService result:', res)
+    await loadServices()
+  } catch (e) {
+    console.error('Start failed:', e)
+    alert('启动失败: ' + (e.response?.data?.error || e.message))
+  }
 }
 
 const handleStop = async (id) => {
-  await stopService(id)
-  await loadServices()
+  console.log('handleStop called with id:', id)
+  try {
+    console.log('Calling stopService...')
+    const res = await stopService(id)
+    console.log('stopService result:', res)
+    await loadServices()
+  } catch (e) {
+    console.error('Stop failed:', e)
+    alert('停止失败: ' + (e.response?.data?.error || e.message))
+  }
 }
 
 const handleRestart = async (id) => {

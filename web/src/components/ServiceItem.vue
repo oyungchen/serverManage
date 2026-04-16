@@ -19,14 +19,14 @@
     <div class="flex items-center gap-2">
       <button
         v-if="service.status === 'running'"
-        @click="$emit('stop')"
+        @click="console.log('Stop button clicked, service:', service); $emit('stop')"
         class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm"
       >
         停止
       </button>
       <button
         v-else
-        @click="$emit('start')"
+        @click="console.log('Start button clicked, service:', service); $emit('start')"
         class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm"
       >
         启动
