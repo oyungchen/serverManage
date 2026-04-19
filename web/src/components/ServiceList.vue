@@ -9,6 +9,7 @@
           @restart="$emit('restart', service.id)"
           @edit="$emit('edit', service)"
           @delete="$emit('delete', service.id)"
+          @open="$emit('open', service)"
         />
       </li>
       <li v-if="services.length === 0" class="px-4 py-8 text-center text-gray-500">
@@ -28,5 +29,5 @@ defineProps({
   }
 })
 
-defineEmits(['refresh', 'start', 'stop', 'restart', 'edit', 'delete'])
+defineEmits(['refresh', 'start', 'stop', 'restart', 'edit', 'delete', 'open'])
 </script>

@@ -2,7 +2,7 @@
 web/node_modules/
 
 # Build output
-web/dist/
+# web/dist/
 
 # IDE
 .idea/
@@ -13,6 +13,7 @@ web/dist/
 
 # Binaries
 server
+serverManage
 
 # Logs
 *.log

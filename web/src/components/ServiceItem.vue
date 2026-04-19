@@ -18,6 +18,14 @@
 
     <div class="flex items-center gap-2">
       <button
+        v-if="service.status === 'running' && service.port"
+        @click="$emit('open')"
+        class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm"
+      >
+        打开
+      </button>
+
+      <button
         v-if="service.status === 'running'"
         @click="console.log('Stop button clicked, service:', service); $emit('stop')"
         class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm"
@@ -65,5 +73,5 @@ defineProps({
   }
 })
 
-defineEmits(['start', 'stop', 'restart', 'edit', 'delete'])
+defineEmits(['start', 'stop', 'restart', 'edit', 'delete', 'open'])
 </script>

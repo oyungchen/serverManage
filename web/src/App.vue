@@ -22,6 +22,7 @@
         @restart="handleRestart"
         @edit="editService"
         @delete="handleDelete"
+        @open="handleOpen"
       />
 
       <div class="mt-4 flex gap-4">
@@ -131,6 +132,12 @@ const handleDelete = async (id) => {
   if (confirm('确定要删除这个服务吗？')) {
     await deleteService(id)
     await loadServices()
+  }
+}
+
+const handleOpen = (service) => {
+  if (service.port) {
+    window.open(`http://localhost:${service.port}`, '_blank')
   }
 }
 
